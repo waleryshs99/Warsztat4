@@ -1,6 +1,28 @@
 $(document).ready(function(){
 var rootDiv = $("#root");
 refreshBooks(rootDiv);
+handleForm()
+
+rootDiv.on('click', '.book', function(){
+    console.log($(this).data("id"));
+    var bookDiv = $(this);
+    var detailDiv = bookDiv.find('div');
+    var bookId = $(this).data("id");
+
+    $.ajax({
+        url:"http://localhost:8282/books/" + bookId,
+        type: "GET"
+    }).done(function(bookDetails){
+        detailDiv.show();
+        detailDiv.text("Autor: "  + ", isbn " + bookDetails.isbn 
+        + ", publisher: " + bookDetails.publisher 
+        + ", type " + bookDetails.type);
+
+    })
+
+})
+})
+
 
 function refreshBooks(rootElement){
     rootElement.html("");
@@ -25,41 +47,35 @@ function refreshBooks(rootElement){
 function handleForm(){
 
     var form = $('.new_book');
-    var submitButon = form.find('#add-button');
+    var submitButton = form.find('#add-button');
     submitButton.on('click', function(event){
-        event.preventDefault();
+    event.preventDefault();
 
-    var author = $('#author').val();
-    var isbn = $('#isbn').val();
-    var publisher = $('publishe').val();
-    var title = $('title').val();
-    var type = $('type').val();
+    var newBook = {};
 
-    })
+    newBook.author = $('#author').val();
+    newBook.isbn = $('#isbn').val();
+    newBook.publisher = $('#publishe').val();
+    newBook.title = $('#title').val();
+    newBook.type = $('#type').val();
 
-}
+        $.ajax({
+            url: "http://localhost:8282/books",
+            type: "POST",
+            header: {
+                'Accept':'application/json',
+                "Content-Type": "application/JSON"
+            },
+            data: JSON.stringify(newBook)
+        }).done(function(){
+            refreshBooks($('#root'));
+        })
+        
 
-rootDiv.on('click', '.book', function(){
-    console.log($(this).data("id"));
-    var bookDiv = $(this);
-    var detailDiv = bookDiv.find('div');
-    var bookId = $(this).data("id");
-
-    $.ajax({
-        url:"http://localhost:8282/books/" + bookId,
-        type: "GET"
-    }).done(function(bookDetails){
-        detailDiv.show();
-        detailDiv.text("Autor: "  + ", isbn " + bookDetails.isbn 
-        + ", publisher: " + bookDetails.publisher 
-        + ", type " + bookDetails.type);
-
-    })
-
-})
 
 
 });
+}
 
 // author
 // isbn
